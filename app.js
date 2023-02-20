@@ -5,6 +5,9 @@ const app = express()
 const cors = require('cors')
 const router = require('./routes')
 const db = require("./models")
+const port = process.env.PORT || 3000
+const http = require('http').createServer(app);
+const io = require('socket.io')(http)
 
 app.enable("trust proxy")
 
@@ -32,5 +35,16 @@ db.mongoose.connect(db.url, {
 })
 
 app.use('/api/v1/', router)
+
+io.on("connection", socket => {
+  console.log("connection in");
+  socket.on("disconnect", () => {
+    console.log("connection out");
+  });
+});
+
+http.listen(port, function () {
+  console.log(`listening on ${port}`)
+})
 
 module.exports = app
